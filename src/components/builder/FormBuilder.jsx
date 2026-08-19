@@ -5,12 +5,19 @@ import { validateForm } from "../../validation/validateForm";
 import BuilderToolbar from "./BuilderToolbar";
 import FormCanvas from "./FormCanvas";
 import FieldEditor from "./FieldEditor";
+import FormPreview from "../form/FormPreview";
 
 function FormBuilder() {
   const [fields, setFields] = useState([]);
   const [selectedFieldId, setSelectedFieldId] = useState(null);
+
   const [formValues, setFormValues] = useState({});
+
   const [errors, setErrors] = useState({});
+
+  const [mode, setMode] = useState("builder");
+
+  const [submissionState, setSubmissionState] = useState("idle");
 
   const selectedField = fields.find((field) => field.id === selectedFieldId);
 
@@ -24,6 +31,8 @@ function FormBuilder() {
       ...prevValues,
       [newField.id]: initialValue,
     }));
+
+    setSubmissionState("idle");
   }
 
   function handleRemoveField(fieldId) {
@@ -32,7 +41,9 @@ function FormBuilder() {
     );
 
     setFormValues((prevValues) => {
-      const updatedValues = { ...prevValues };
+      const updatedValues = {
+        ...prevValues,
+      };
 
       delete updatedValues[fieldId];
 
@@ -40,7 +51,9 @@ function FormBuilder() {
     });
 
     setErrors((prevErrors) => {
-      const updatedErrors = { ...prevErrors };
+      const updatedErrors = {
+        ...prevErrors,
+      };
 
       delete updatedErrors[fieldId];
 
@@ -50,6 +63,8 @@ function FormBuilder() {
     setSelectedFieldId((prevSelectedId) =>
       prevSelectedId === fieldId ? null : prevSelectedId,
     );
+
+    setSubmissionState("idle");
   }
 
   function handleEditField(fieldId) {
@@ -62,19 +77,21 @@ function FormBuilder() {
       [fieldId]: value,
     }));
 
-    // Remove an old validation error as soon as
-    // the user starts correcting that field.
     setErrors((prevErrors) => {
       if (!prevErrors[fieldId]) {
         return prevErrors;
       }
 
-      const updatedErrors = { ...prevErrors };
+      const updatedErrors = {
+        ...prevErrors,
+      };
 
       delete updatedErrors[fieldId];
 
       return updatedErrors;
     });
+
+    setSubmissionState("idle");
   }
 
   function handleSaveField(updatedField) {
@@ -84,14 +101,14 @@ function FormBuilder() {
       ),
     );
 
-    // A configuration change can make an existing
-    // validation error stale.
     setErrors((prevErrors) => {
       if (!prevErrors[updatedField.id]) {
         return prevErrors;
       }
 
-      const updatedErrors = { ...prevErrors };
+      const updatedErrors = {
+        ...prevErrors,
+      };
 
       delete updatedErrors[updatedField.id];
 
@@ -99,20 +116,71 @@ function FormBuilder() {
     });
 
     setSelectedFieldId(null);
+    setSubmissionState("idle");
   }
 
   function handleCloseEditor() {
     setSelectedFieldId(null);
   }
 
-  function handleValidateForm() {
+  function validateCurrentForm() {
     const validationErrors = validateForm(fields, formValues);
 
     setErrors(validationErrors);
 
+    return validationErrors;
+  }
+
+  function handlePreview() {
+    setSelectedFieldId(null);
+    setErrors({});
+    setSubmissionState("idle");
+    setMode("preview");
+  }
+
+  function handleBackToBuilder() {
+    setSelectedFieldId(null);
+    setSubmissionState("idle");
+    setMode("builder");
+  }
+
+  function handleSubmit() {
+    const validationErrors = validateCurrentForm();
+
     const isValid = Object.keys(validationErrors).length === 0;
 
-    return isValid;
+    if (!isValid) {
+      setSubmissionState("idle");
+      return;
+    }
+
+    setSubmissionState("success");
+
+    console.log("Submitted form data:", formValues);
+  }
+
+  if (mode === "preview") {
+    return (
+      <main>
+        <h1>Dynamic Form Builder</h1>
+
+        <FormPreview
+          fields={fields}
+          formValues={formValues}
+          errors={errors}
+          onChange={handleFieldChange}
+          onSubmit={handleSubmit}
+          onBack={handleBackToBuilder}
+        />
+
+        {submissionState === "success" && (
+          <section>
+            <h2>Form Submitted Successfully</h2>
+            <p>The form passed validation and was submitted successfully.</p>
+          </section>
+        )}
+      </main>
+    );
   }
 
   return (
@@ -142,19 +210,15 @@ function FormBuilder() {
         />
       )}
 
-      <button type="button" onClick={handleValidateForm}>
-        Validate Form
-      </button>
-
-      <h2>Form Values</h2>
-
-      <pre>{JSON.stringify(formValues, null, 2)}</pre>
-
-      <h2>Errors</h2>
-
-      <pre>{JSON.stringify(errors, null, 2)}</pre>
-
-      <p>Selected field: {selectedFieldId ?? "None"}</p>
+      <div>
+        <button
+          type="button"
+          onClick={handlePreview}
+          disabled={fields.length === 0}
+        >
+          Preview Form
+        </button>
+      </div>
     </main>
   );
 }

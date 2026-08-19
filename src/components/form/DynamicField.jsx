@@ -26,6 +26,7 @@ function DynamicField({ field, value, onChange }) {
             type="text"
             value={value}
             placeholder={field.placeholder}
+            required={field.required}
             onChange={handleChange}
           />
         </div>
@@ -41,6 +42,7 @@ function DynamicField({ field, value, onChange }) {
             type="email"
             value={value}
             placeholder={field.placeholder}
+            required={field.required}
             onChange={handleChange}
           />
         </div>
@@ -56,6 +58,7 @@ function DynamicField({ field, value, onChange }) {
             type="number"
             value={value}
             placeholder={field.placeholder}
+            required={field.required}
             onChange={handleChange}
           />
         </div>
@@ -66,7 +69,7 @@ function DynamicField({ field, value, onChange }) {
         <div>
           <label htmlFor={field.id}>{field.label}</label>
 
-          <select id={field.id} value={value} onChange={handleChange}>
+          <select id={field.id} value={value} required={field.required} onChange={handleChange}>
             {field.options.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
@@ -83,6 +86,7 @@ function DynamicField({ field, value, onChange }) {
             id={field.id}
             type="checkbox"
             checked={value}
+            required={field.required}
             onChange={handleChange}
           />
 
@@ -95,7 +99,7 @@ function DynamicField({ field, value, onChange }) {
         <div>
           <label htmlFor={field.id}>{field.label}</label>
 
-          <input id={field.id} type="file" onChange={handleChange} />
+          <input id={field.id} type="file" required={field.required} onChange={handleChange} />
         </div>
       );
 

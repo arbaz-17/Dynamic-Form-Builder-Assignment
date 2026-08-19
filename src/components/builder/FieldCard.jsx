@@ -6,14 +6,19 @@ function FieldCard({
   onChange,
   onRemove,
   onEdit,
+  isSelected,
 }) {
   return (
     <article>
-      <DynamicField
-        field={field}
-        value={value}
-        onChange={(newValue) => onChange(field.id, newValue)}
-      />
+      <div>
+        <DynamicField
+          field={field}
+          value={value}
+          onChange={(newValue) =>
+            onChange(field.id, newValue)
+          }
+        />
+      </div>
 
       <div>
         <button
@@ -30,6 +35,8 @@ function FieldCard({
           Remove
         </button>
       </div>
+
+      {isSelected && <p>Currently editing</p>}
     </article>
   );
 }

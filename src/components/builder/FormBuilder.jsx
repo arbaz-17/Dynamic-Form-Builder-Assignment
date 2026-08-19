@@ -86,13 +86,14 @@ function FormBuilder() {
 
       <p>Field count: {fields.length}</p>
 
-      <FormCanvas
-        fields={fields}
-        formValues={formValues}
-        onChange={handleFieldChange}
-        onRemoveField={handleRemoveField}
-        onEditField={handleEditField}
-      />
+<FormCanvas
+  fields={fields}
+  formValues={formValues}
+  selectedFieldId={selectedFieldId}
+  onChange={handleFieldChange}
+  onRemoveField={handleRemoveField}
+  onEditField={handleEditField}
+/>
 
       {selectedField && (
         <FieldEditor

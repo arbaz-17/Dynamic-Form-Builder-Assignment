@@ -1,4 +1,4 @@
-function DynamicField({ field, value, onChange }) {
+function DynamicField({ field, value, error, onChange }) {
   function handleChange(event) {
     const { type, checked, value: inputValue } = event.target;
 
@@ -15,6 +15,18 @@ function DynamicField({ field, value, onChange }) {
     onChange(inputValue);
   }
 
+  function renderError() {
+    if (!error) {
+      return null;
+    }
+
+    return (
+      <p id={`${field.id}-error`} role="alert">
+        {error}
+      </p>
+    );
+  }
+
   switch (field.type) {
     case "text":
       return (
@@ -26,8 +38,13 @@ function DynamicField({ field, value, onChange }) {
             type="text"
             value={value}
             placeholder={field.placeholder}
+            required={field.required}
+            aria-invalid={Boolean(error)}
+            aria-describedby={error ? `${field.id}-error` : undefined}
             onChange={handleChange}
           />
+
+          {renderError()}
         </div>
       );
 
@@ -41,8 +58,13 @@ function DynamicField({ field, value, onChange }) {
             type="email"
             value={value}
             placeholder={field.placeholder}
+            required={field.required}
+            aria-invalid={Boolean(error)}
+            aria-describedby={error ? `${field.id}-error` : undefined}
             onChange={handleChange}
           />
+
+          {renderError()}
         </div>
       );
 
@@ -56,8 +78,13 @@ function DynamicField({ field, value, onChange }) {
             type="number"
             value={value}
             placeholder={field.placeholder}
+            required={field.required}
+            aria-invalid={Boolean(error)}
+            aria-describedby={error ? `${field.id}-error` : undefined}
             onChange={handleChange}
           />
+
+          {renderError()}
         </div>
       );
 
@@ -66,13 +93,22 @@ function DynamicField({ field, value, onChange }) {
         <div>
           <label htmlFor={field.id}>{field.label}</label>
 
-          <select id={field.id} value={value} onChange={handleChange}>
+          <select
+            id={field.id}
+            value={value}
+            required={field.required}
+            aria-invalid={Boolean(error)}
+            aria-describedby={error ? `${field.id}-error` : undefined}
+            onChange={handleChange}
+          >
             {field.options.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
             ))}
           </select>
+
+          {renderError()}
         </div>
       );
 
@@ -83,10 +119,15 @@ function DynamicField({ field, value, onChange }) {
             id={field.id}
             type="checkbox"
             checked={value}
+            required={field.required}
+            aria-invalid={Boolean(error)}
+            aria-describedby={error ? `${field.id}-error` : undefined}
             onChange={handleChange}
           />
 
           <label htmlFor={field.id}>{field.label}</label>
+
+          {renderError()}
         </div>
       );
 
@@ -95,7 +136,16 @@ function DynamicField({ field, value, onChange }) {
         <div>
           <label htmlFor={field.id}>{field.label}</label>
 
-          <input id={field.id} type="file" onChange={handleChange} />
+          <input
+            id={field.id}
+            type="file"
+            required={field.required}
+            aria-invalid={Boolean(error)}
+            aria-describedby={error ? `${field.id}-error` : undefined}
+            onChange={handleChange}
+          />
+
+          {renderError()}
         </div>
       );
 

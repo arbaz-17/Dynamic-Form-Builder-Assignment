@@ -3,16 +3,21 @@ import DynamicField from "../form/DynamicField";
 function FieldCard({
   field,
   value,
+  error,
   onChange,
   onRemove,
   onEdit,
+  isSelected,
 }) {
   return (
     <article>
       <DynamicField
         field={field}
         value={value}
-        onChange={(newValue) => onChange(field.id, newValue)}
+        error={error}
+        onChange={(newValue) =>
+          onChange(field.id, newValue)
+        }
       />
 
       <div>
@@ -30,6 +35,8 @@ function FieldCard({
           Remove
         </button>
       </div>
+
+      {isSelected && <p>Currently editing</p>}
     </article>
   );
 }

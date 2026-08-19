@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createField } from "../../utils/createField";
 import { getInitialValue } from "../../utils/getInitialValue";
+import { getInitialFormValues } from "../../utils/getInitialFormValues";
+import { loadFields, saveFields } from "../../utils/storage";
 import { validateForm } from "../../validation/validateForm";
 import BuilderToolbar from "./BuilderToolbar";
 import FormCanvas from "./FormCanvas";
@@ -8,16 +10,16 @@ import FieldEditor from "./FieldEditor";
 import FormPreview from "../form/FormPreview";
 
 function FormBuilder() {
-  const [fields, setFields] = useState([]);
+  const [fields, setFields] = useState(() => loadFields());
   const [selectedFieldId, setSelectedFieldId] = useState(null);
-
   const [formValues, setFormValues] = useState({});
-
   const [errors, setErrors] = useState({});
-
   const [mode, setMode] = useState("builder");
-
   const [submissionState, setSubmissionState] = useState("idle");
+
+  useEffect(() => {
+    saveFields(fields);
+  }, [fields]);
 
   const selectedField = fields.find((field) => field.id === selectedFieldId);
 
@@ -41,9 +43,7 @@ function FormBuilder() {
     );
 
     setFormValues((prevValues) => {
-      const updatedValues = {
-        ...prevValues,
-      };
+      const updatedValues = { ...prevValues };
 
       delete updatedValues[fieldId];
 
@@ -51,9 +51,7 @@ function FormBuilder() {
     });
 
     setErrors((prevErrors) => {
-      const updatedErrors = {
-        ...prevErrors,
-      };
+      const updatedErrors = { ...prevErrors };
 
       delete updatedErrors[fieldId];
 
@@ -82,9 +80,7 @@ function FormBuilder() {
         return prevErrors;
       }
 
-      const updatedErrors = {
-        ...prevErrors,
-      };
+      const updatedErrors = { ...prevErrors };
 
       delete updatedErrors[fieldId];
 
@@ -106,9 +102,7 @@ function FormBuilder() {
         return prevErrors;
       }
 
-      const updatedErrors = {
-        ...prevErrors,
-      };
+      const updatedErrors = { ...prevErrors };
 
       delete updatedErrors[updatedField.id];
 
@@ -140,7 +134,11 @@ function FormBuilder() {
 
   function handleBackToBuilder() {
     setSelectedFieldId(null);
+    setErrors({});
     setSubmissionState("idle");
+
+    setFormValues(getInitialFormValues(fields));
+
     setMode("builder");
   }
 
@@ -159,66 +157,100 @@ function FormBuilder() {
     console.log("Submitted form data:", formValues);
   }
 
+  // --- PREVIEW MODE RENDER ---
   if (mode === "preview") {
     return (
-      <main>
-        <h1>Dynamic Form Builder</h1>
+      <main className="app-shell">
+        <header className="app-header">
+          <h1>Preview Mode</h1>
 
-        <FormPreview
-          fields={fields}
-          formValues={formValues}
-          errors={errors}
-          onChange={handleFieldChange}
-          onSubmit={handleSubmit}
-          onBack={handleBackToBuilder}
-        />
+          <p>Test your form exactly as users will see it.</p>
+        </header>
 
-        {submissionState === "success" && (
-          <section>
-            <h2>Form Submitted Successfully</h2>
-            <p>The form passed validation and was submitted successfully.</p>
-          </section>
-        )}
+        <section className="builder-section">
+          <FormPreview
+            fields={fields}
+            formValues={formValues}
+            errors={errors}
+            onChange={handleFieldChange}
+            onSubmit={handleSubmit}
+            onBack={handleBackToBuilder}
+          />
+
+          {submissionState === "success" && (
+            <div className="success-banner">
+              <h3>Form Submitted Successfully</h3>
+
+              <p>The form passed validation and data was recorded.</p>
+            </div>
+          )}
+        </section>
       </main>
     );
   }
 
+  // --- BUILDER MODE RENDER ---
   return (
-    <main>
-      <h1>Dynamic Form Builder</h1>
+    <main className="app-shell">
+      <header className="app-header">
+        <h1>Dynamic Form Builder - Week 5 Assignment</h1>
 
-      <BuilderToolbar onAddField={handleAddField} />
+        <p>
+          Create and configure form fields, then preview the generated form.
+        </p>
+      </header>
 
-      <p>Field count: {fields.length}</p>
+      <section className="builder-layout">
+        <div className="builder-main">
+          <section className="builder-section">
+            <h2>Add Fields</h2>
 
-      <FormCanvas
-        fields={fields}
-        formValues={formValues}
-        errors={errors}
-        selectedFieldId={selectedFieldId}
-        onChange={handleFieldChange}
-        onRemoveField={handleRemoveField}
-        onEditField={handleEditField}
-      />
+            <BuilderToolbar onAddField={handleAddField} />
+          </section>
 
-      {selectedField && (
-        <FieldEditor
-          key={selectedField.id}
-          field={selectedField}
-          onSave={handleSaveField}
-          onClose={handleCloseEditor}
-        />
-      )}
+          <section className="builder-section">
+            <FormCanvas
+              fields={fields}
+              formValues={formValues}
+              errors={errors}
+              selectedFieldId={selectedFieldId}
+              onChange={handleFieldChange}
+              onRemoveField={handleRemoveField}
+              onEditField={handleEditField}
+            />
+          </section>
 
-      <div>
-        <button
-          type="button"
-          onClick={handlePreview}
-          disabled={fields.length === 0}
-        >
-          Preview Form
-        </button>
-      </div>
+          <section className="builder-actions">
+            <button
+              type="button"
+              className="btn-primary"
+              onClick={handlePreview}
+              disabled={fields.length === 0}
+            >
+              Preview Form &rarr;
+            </button>
+          </section>
+        </div>
+
+        <aside className="editor-panel">
+          {selectedField ? (
+            <FieldEditor
+              key={selectedField.id}
+              field={selectedField}
+              onSave={handleSaveField}
+              onClose={handleCloseEditor}
+            />
+          ) : (
+            <div className="editor-empty-state">
+              <h2>Field Editor</h2>
+
+              <p>
+                Select a field in the canvas and click Edit to configure it.
+              </p>
+            </div>
+          )}
+        </aside>
+      </section>
     </main>
   );
 }

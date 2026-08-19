@@ -1,4 +1,8 @@
+import { useRef } from "react";
+
 function DynamicField({ field, value, error, onChange }) {
+  const fileInputRef = useRef(null);
+
   function handleChange(event) {
     const { type, checked, value: inputValue } = event.target;
 
@@ -16,66 +20,31 @@ function DynamicField({ field, value, error, onChange }) {
   }
 
   function renderError() {
-    if (!error) {
-      return null;
-    }
-
+    if (!error) return null;
     return (
-      <p id={`${field.id}-error`} role="alert">
+      <p id={`${field.id}-error`} role="alert" className="error-text">
         {error}
       </p>
     );
   }
 
+  function handleClearFile() {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+    onChange(null);
+  }
+
   switch (field.type) {
     case "text":
-      return (
-        <div>
-          <label htmlFor={field.id}>{field.label}</label>
-
-          <input
-            id={field.id}
-            type="text"
-            value={value}
-            placeholder={field.placeholder}
-            required={field.required}
-            aria-invalid={Boolean(error)}
-            aria-describedby={error ? `${field.id}-error` : undefined}
-            onChange={handleChange}
-          />
-
-          {renderError()}
-        </div>
-      );
-
     case "email":
-      return (
-        <div>
-          <label htmlFor={field.id}>{field.label}</label>
-
-          <input
-            id={field.id}
-            type="email"
-            value={value}
-            placeholder={field.placeholder}
-            required={field.required}
-            aria-invalid={Boolean(error)}
-            aria-describedby={error ? `${field.id}-error` : undefined}
-            onChange={handleChange}
-          />
-
-          {renderError()}
-        </div>
-      );
-
     case "number":
       return (
-        <div>
+        <div className="input-group">
           <label htmlFor={field.id}>{field.label}</label>
-
           <input
             id={field.id}
-            type="number"
+            type={field.type}
             value={value}
             placeholder={field.placeholder}
             required={field.required}
@@ -83,16 +52,14 @@ function DynamicField({ field, value, error, onChange }) {
             aria-describedby={error ? `${field.id}-error` : undefined}
             onChange={handleChange}
           />
-
           {renderError()}
         </div>
       );
 
     case "select":
       return (
-        <div>
+        <div className="input-group">
           <label htmlFor={field.id}>{field.label}</label>
-
           <select
             id={field.id}
             value={value}
@@ -107,14 +74,13 @@ function DynamicField({ field, value, error, onChange }) {
               </option>
             ))}
           </select>
-
           {renderError()}
         </div>
       );
 
     case "checkbox":
       return (
-        <div>
+        <div className="checkbox-group">
           <input
             id={field.id}
             type="checkbox"
@@ -124,27 +90,38 @@ function DynamicField({ field, value, error, onChange }) {
             aria-describedby={error ? `${field.id}-error` : undefined}
             onChange={handleChange}
           />
-
           <label htmlFor={field.id}>{field.label}</label>
-
           {renderError()}
         </div>
       );
 
     case "file":
       return (
-        <div>
+        <div className="input-group">
           <label htmlFor={field.id}>{field.label}</label>
-
           <input
+            ref={fileInputRef}
             id={field.id}
             type="file"
             required={field.required}
             aria-invalid={Boolean(error)}
             aria-describedby={error ? `${field.id}-error` : undefined}
             onChange={handleChange}
+            className="file-input"
           />
-
+          
+          {value && (
+            <div className="file-preview">
+              <span className="file-name">Selected: {value.name}</span>
+              <button
+                type="button"
+                className="btn-secondary btn-sm"
+                onClick={handleClearFile}
+              >
+                Clear
+              </button>
+            </div>
+          )}
           {renderError()}
         </div>
       );

@@ -1,45 +1,22 @@
 function BuilderToolbar({ onAddField }) {
   return (
-    <div>
-      <button
-        type="button"
-        onClick={() => onAddField("text")}
-      >
+    <div className="field-toolbar">
+      <button type="button" onClick={() => onAddField("text")}>
         + Text
       </button>
-
-      <button
-        type="button"
-        onClick={() => onAddField("email")}
-      >
+      <button type="button" onClick={() => onAddField("email")}>
         + Email
       </button>
-
-      <button
-        type="button"
-        onClick={() => onAddField("number")}
-      >
+      <button type="button" onClick={() => onAddField("number")}>
         + Number
       </button>
-
-      <button
-        type="button"
-        onClick={() => onAddField("select")}
-      >
+      <button type="button" onClick={() => onAddField("select")}>
         + Select
       </button>
-
-      <button
-        type="button"
-        onClick={() => onAddField("checkbox")}
-      >
+      <button type="button" onClick={() => onAddField("checkbox")}>
         + Checkbox
       </button>
-
-      <button
-        type="button"
-        onClick={() => onAddField("file")}
-      >
+      <button type="button" onClick={() => onAddField("file")}>
         + File
       </button>
     </div>

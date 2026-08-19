@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createField } from "../../utils/createField";
 import { getInitialValue } from "../../utils/getInitialValue";
+import { getInitialFormValues } from "../../utils/getInitialFormValues";
+import { loadFields, saveFields } from "../../utils/storage";
 import { validateForm } from "../../validation/validateForm";
 import BuilderToolbar from "./BuilderToolbar";
 import FormCanvas from "./FormCanvas";
@@ -8,23 +10,30 @@ import FieldEditor from "./FieldEditor";
 import FormPreview from "../form/FormPreview";
 
 function FormBuilder() {
-  const [fields, setFields] = useState([]);
+  const [fields, setFields] = useState(() => loadFields());
   const [selectedFieldId, setSelectedFieldId] = useState(null);
   const [formValues, setFormValues] = useState({});
   const [errors, setErrors] = useState({});
   const [mode, setMode] = useState("builder");
   const [submissionState, setSubmissionState] = useState("idle");
 
+  useEffect(() => {
+    saveFields(fields);
+  }, [fields]);
+
   const selectedField = fields.find((field) => field.id === selectedFieldId);
 
   function handleAddField(type) {
     const newField = createField(type);
     const initialValue = getInitialValue(newField);
+
     setFields((prevFields) => [...prevFields, newField]);
+
     setFormValues((prevValues) => ({
       ...prevValues,
       [newField.id]: initialValue,
     }));
+
     setSubmissionState("idle");
   }
 
@@ -32,19 +41,27 @@ function FormBuilder() {
     setFields((prevFields) =>
       prevFields.filter((field) => field.id !== fieldId),
     );
+
     setFormValues((prevValues) => {
       const updatedValues = { ...prevValues };
+
       delete updatedValues[fieldId];
+
       return updatedValues;
     });
+
     setErrors((prevErrors) => {
       const updatedErrors = { ...prevErrors };
+
       delete updatedErrors[fieldId];
+
       return updatedErrors;
     });
+
     setSelectedFieldId((prevSelectedId) =>
       prevSelectedId === fieldId ? null : prevSelectedId,
     );
+
     setSubmissionState("idle");
   }
 
@@ -57,12 +74,19 @@ function FormBuilder() {
       ...prevValues,
       [fieldId]: value,
     }));
+
     setErrors((prevErrors) => {
-      if (!prevErrors[fieldId]) return prevErrors;
+      if (!prevErrors[fieldId]) {
+        return prevErrors;
+      }
+
       const updatedErrors = { ...prevErrors };
+
       delete updatedErrors[fieldId];
+
       return updatedErrors;
     });
+
     setSubmissionState("idle");
   }
 
@@ -72,12 +96,19 @@ function FormBuilder() {
         field.id === updatedField.id ? updatedField : field,
       ),
     );
+
     setErrors((prevErrors) => {
-      if (!prevErrors[updatedField.id]) return prevErrors;
+      if (!prevErrors[updatedField.id]) {
+        return prevErrors;
+      }
+
       const updatedErrors = { ...prevErrors };
+
       delete updatedErrors[updatedField.id];
+
       return updatedErrors;
     });
+
     setSelectedFieldId(null);
     setSubmissionState("idle");
   }
@@ -88,7 +119,9 @@ function FormBuilder() {
 
   function validateCurrentForm() {
     const validationErrors = validateForm(fields, formValues);
+
     setErrors(validationErrors);
+
     return validationErrors;
   }
 
@@ -101,12 +134,17 @@ function FormBuilder() {
 
   function handleBackToBuilder() {
     setSelectedFieldId(null);
+    setErrors({});
     setSubmissionState("idle");
+
+    setFormValues(getInitialFormValues(fields));
+
     setMode("builder");
   }
 
   function handleSubmit() {
     const validationErrors = validateCurrentForm();
+
     const isValid = Object.keys(validationErrors).length === 0;
 
     if (!isValid) {
@@ -115,6 +153,7 @@ function FormBuilder() {
     }
 
     setSubmissionState("success");
+
     console.log("Submitted form data:", formValues);
   }
 
@@ -124,6 +163,7 @@ function FormBuilder() {
       <main className="app-shell">
         <header className="app-header">
           <h1>Preview Mode</h1>
+
           <p>Test your form exactly as users will see it.</p>
         </header>
 
@@ -140,6 +180,7 @@ function FormBuilder() {
           {submissionState === "success" && (
             <div className="success-banner">
               <h3>Form Submitted Successfully</h3>
+
               <p>The form passed validation and data was recorded.</p>
             </div>
           )}
@@ -153,9 +194,9 @@ function FormBuilder() {
     <main className="app-shell">
       <header className="app-header">
         <h1>Dynamic Form Builder - Week 5 Assignment</h1>
+
         <p>
-          Create and configure form fields, then preview the generated
-          form.
+          Create and configure form fields, then preview the generated form.
         </p>
       </header>
 
@@ -163,6 +204,7 @@ function FormBuilder() {
         <div className="builder-main">
           <section className="builder-section">
             <h2>Add Fields</h2>
+
             <BuilderToolbar onAddField={handleAddField} />
           </section>
 
@@ -201,6 +243,7 @@ function FormBuilder() {
           ) : (
             <div className="editor-empty-state">
               <h2>Field Editor</h2>
+
               <p>
                 Select a field in the canvas and click Edit to configure it.
               </p>

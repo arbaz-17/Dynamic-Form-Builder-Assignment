@@ -3,6 +3,7 @@ import FieldCard from "./FieldCard";
 function FormCanvas({
   fields,
   formValues,
+  errors,
   selectedFieldId,
   onChange,
   onRemoveField,
@@ -28,6 +29,7 @@ function FormCanvas({
           key={field.id}
           field={field}
           value={formValues[field.id]}
+          error={errors[field.id]}
           isSelected={field.id === selectedFieldId}
           onChange={onChange}
           onRemove={onRemoveField}

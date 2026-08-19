@@ -3,6 +3,7 @@ import DynamicField from "../form/DynamicField";
 function FieldCard({
   field,
   value,
+  error,
   onChange,
   onRemove,
   onEdit,
@@ -10,15 +11,14 @@ function FieldCard({
 }) {
   return (
     <article>
-      <div>
-        <DynamicField
-          field={field}
-          value={value}
-          onChange={(newValue) =>
-            onChange(field.id, newValue)
-          }
-        />
-      </div>
+      <DynamicField
+        field={field}
+        value={value}
+        error={error}
+        onChange={(newValue) =>
+          onChange(field.id, newValue)
+        }
+      />
 
       <div>
         <button

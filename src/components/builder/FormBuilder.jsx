@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { createField } from "../../utils/createField";
 import { getInitialValue } from "../../utils/getInitialValue";
+import { validateForm } from "../../validation/validateForm";
 import BuilderToolbar from "./BuilderToolbar";
 import FormCanvas from "./FormCanvas";
 import FieldEditor from "./FieldEditor";
@@ -11,9 +12,7 @@ function FormBuilder() {
   const [formValues, setFormValues] = useState({});
   const [errors, setErrors] = useState({});
 
-  const selectedField = fields.find(
-    (field) => field.id === selectedFieldId
-  );
+  const selectedField = fields.find((field) => field.id === selectedFieldId);
 
   function handleAddField(type) {
     const newField = createField(type);
@@ -29,7 +28,7 @@ function FormBuilder() {
 
   function handleRemoveField(fieldId) {
     setFields((prevFields) =>
-      prevFields.filter((field) => field.id !== fieldId)
+      prevFields.filter((field) => field.id !== fieldId),
     );
 
     setFormValues((prevValues) => {
@@ -49,7 +48,7 @@ function FormBuilder() {
     });
 
     setSelectedFieldId((prevSelectedId) =>
-      prevSelectedId === fieldId ? null : prevSelectedId
+      prevSelectedId === fieldId ? null : prevSelectedId,
     );
   }
 
@@ -62,20 +61,58 @@ function FormBuilder() {
       ...prevValues,
       [fieldId]: value,
     }));
+
+    // Remove an old validation error as soon as
+    // the user starts correcting that field.
+    setErrors((prevErrors) => {
+      if (!prevErrors[fieldId]) {
+        return prevErrors;
+      }
+
+      const updatedErrors = { ...prevErrors };
+
+      delete updatedErrors[fieldId];
+
+      return updatedErrors;
+    });
   }
 
   function handleSaveField(updatedField) {
     setFields((prevFields) =>
       prevFields.map((field) =>
-        field.id === updatedField.id ? updatedField : field
-      )
+        field.id === updatedField.id ? updatedField : field,
+      ),
     );
+
+    // A configuration change can make an existing
+    // validation error stale.
+    setErrors((prevErrors) => {
+      if (!prevErrors[updatedField.id]) {
+        return prevErrors;
+      }
+
+      const updatedErrors = { ...prevErrors };
+
+      delete updatedErrors[updatedField.id];
+
+      return updatedErrors;
+    });
 
     setSelectedFieldId(null);
   }
 
   function handleCloseEditor() {
     setSelectedFieldId(null);
+  }
+
+  function handleValidateForm() {
+    const validationErrors = validateForm(fields, formValues);
+
+    setErrors(validationErrors);
+
+    const isValid = Object.keys(validationErrors).length === 0;
+
+    return isValid;
   }
 
   return (
@@ -86,14 +123,15 @@ function FormBuilder() {
 
       <p>Field count: {fields.length}</p>
 
-<FormCanvas
-  fields={fields}
-  formValues={formValues}
-  selectedFieldId={selectedFieldId}
-  onChange={handleFieldChange}
-  onRemoveField={handleRemoveField}
-  onEditField={handleEditField}
-/>
+      <FormCanvas
+        fields={fields}
+        formValues={formValues}
+        errors={errors}
+        selectedFieldId={selectedFieldId}
+        onChange={handleFieldChange}
+        onRemoveField={handleRemoveField}
+        onEditField={handleEditField}
+      />
 
       {selectedField && (
         <FieldEditor
@@ -104,15 +142,19 @@ function FormBuilder() {
         />
       )}
 
+      <button type="button" onClick={handleValidateForm}>
+        Validate Form
+      </button>
+
       <h2>Form Values</h2>
+
       <pre>{JSON.stringify(formValues, null, 2)}</pre>
 
       <h2>Errors</h2>
+
       <pre>{JSON.stringify(errors, null, 2)}</pre>
 
-      <p>
-        Selected field: {selectedFieldId ?? "None"}
-      </p>
+      <p>Selected field: {selectedFieldId ?? "None"}</p>
     </main>
   );
 }

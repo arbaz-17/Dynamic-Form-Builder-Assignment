@@ -2,6 +2,7 @@ import { useState } from "react";
 import { createField } from "../../utils/createField";
 import { getInitialValue } from "../../utils/getInitialValue";
 import BuilderToolbar from "./BuilderToolbar";
+import FormCanvas from "./FormCanvas";
 
 function FormBuilder() {
   const [fields, setFields] = useState([]);
@@ -28,23 +29,30 @@ function FormBuilder() {
 
     setFormValues((prevValues) => {
       const updatedValues = { ...prevValues };
-
       delete updatedValues[fieldId];
-
       return updatedValues;
     });
 
     setErrors((prevErrors) => {
       const updatedErrors = { ...prevErrors };
-
       delete updatedErrors[fieldId];
-
       return updatedErrors;
     });
 
     setSelectedFieldId((prevSelectedId) =>
       prevSelectedId === fieldId ? null : prevSelectedId
     );
+  }
+
+  function handleEditField(fieldId) {
+    setSelectedFieldId(fieldId);
+  }
+
+  function handleFieldChange(fieldId, value) {
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      [fieldId]: value,
+    }));
   }
 
   return (
@@ -55,24 +63,13 @@ function FormBuilder() {
 
       <p>Field count: {fields.length}</p>
 
-      <h2>Fields</h2>
-
-      {fields.map((field) => (
-        <div key={field.id}>
-          <span>
-            {field.label} ({field.type})
-          </span>
-
-          <button
-            type="button"
-            onClick={() => handleRemoveField(field.id)}
-          >
-            Remove
-          </button>
-        </div>
-      ))}
-
-      <pre>{JSON.stringify(fields, null, 2)}</pre>
+      <FormCanvas
+        fields={fields}
+        formValues={formValues}
+        onChange={handleFieldChange}
+        onRemoveField={handleRemoveField}
+        onEditField={handleEditField}
+      />
 
       <h2>Form Values</h2>
       <pre>{JSON.stringify(formValues, null, 2)}</pre>

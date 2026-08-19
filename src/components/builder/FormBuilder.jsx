@@ -3,12 +3,17 @@ import { createField } from "../../utils/createField";
 import { getInitialValue } from "../../utils/getInitialValue";
 import BuilderToolbar from "./BuilderToolbar";
 import FormCanvas from "./FormCanvas";
+import FieldEditor from "./FieldEditor";
 
 function FormBuilder() {
   const [fields, setFields] = useState([]);
   const [selectedFieldId, setSelectedFieldId] = useState(null);
   const [formValues, setFormValues] = useState({});
   const [errors, setErrors] = useState({});
+
+  const selectedField = fields.find(
+    (field) => field.id === selectedFieldId
+  );
 
   function handleAddField(type) {
     const newField = createField(type);
@@ -29,13 +34,17 @@ function FormBuilder() {
 
     setFormValues((prevValues) => {
       const updatedValues = { ...prevValues };
+
       delete updatedValues[fieldId];
+
       return updatedValues;
     });
 
     setErrors((prevErrors) => {
       const updatedErrors = { ...prevErrors };
+
       delete updatedErrors[fieldId];
+
       return updatedErrors;
     });
 
@@ -55,6 +64,20 @@ function FormBuilder() {
     }));
   }
 
+  function handleSaveField(updatedField) {
+    setFields((prevFields) =>
+      prevFields.map((field) =>
+        field.id === updatedField.id ? updatedField : field
+      )
+    );
+
+    setSelectedFieldId(null);
+  }
+
+  function handleCloseEditor() {
+    setSelectedFieldId(null);
+  }
+
   return (
     <main>
       <h1>Dynamic Form Builder</h1>
@@ -70,6 +93,15 @@ function FormBuilder() {
         onRemoveField={handleRemoveField}
         onEditField={handleEditField}
       />
+
+      {selectedField && (
+        <FieldEditor
+          key={selectedField.id}
+          field={selectedField}
+          onSave={handleSaveField}
+          onClose={handleCloseEditor}
+        />
+      )}
 
       <h2>Form Values</h2>
       <pre>{JSON.stringify(formValues, null, 2)}</pre>

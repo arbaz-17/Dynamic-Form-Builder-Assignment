@@ -1,4 +1,8 @@
+import { useRef } from "react";
+
 function DynamicField({ field, value, error, onChange }) {
+    const fileInputRef = useRef(null);
+    
   function handleChange(event) {
     const { type, checked, value: inputValue } = event.target;
 
@@ -26,6 +30,14 @@ function DynamicField({ field, value, error, onChange }) {
       </p>
     );
   }
+
+  function handleClearFile() {
+  if (fileInputRef.current) {
+    fileInputRef.current.value = "";
+  }
+
+  onChange(null);
+}
 
   switch (field.type) {
     case "text":
@@ -131,23 +143,45 @@ function DynamicField({ field, value, error, onChange }) {
         </div>
       );
 
-    case "file":
-      return (
-        <div>
-          <label htmlFor={field.id}>{field.label}</label>
+case "file":
+  return (
+    <div>
+      <label htmlFor={field.id}>
+        {field.label}
+      </label>
 
-          <input
-            id={field.id}
-            type="file"
-            required={field.required}
-            aria-invalid={Boolean(error)}
-            aria-describedby={error ? `${field.id}-error` : undefined}
-            onChange={handleChange}
-          />
+      <input
+        ref={fileInputRef}
+        id={field.id}
+        type="file"
+        required={field.required}
+        aria-invalid={Boolean(error)}
+        aria-describedby={
+          error
+            ? `${field.id}-error`
+            : undefined
+        }
+        onChange={handleChange}
+      />
 
-          {renderError()}
-        </div>
-      );
+      {value && (
+        <p>
+          Selected file: {value.name}
+        </p>
+      )}
+
+      {value && (
+        <button
+          type="button"
+          onClick={handleClearFile}
+        >
+          Clear File
+        </button>
+      )}
+
+      {renderError()}
+    </div>
+  );
 
     default:
       return null;

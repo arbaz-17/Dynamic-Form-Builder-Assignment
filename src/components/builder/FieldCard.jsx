@@ -10,33 +10,35 @@ function FieldCard({
   isSelected,
 }) {
   return (
-    <article>
+    <article className={`field-card ${isSelected ? "field-card-selected" : ""}`}>
       <DynamicField
         field={field}
         value={value}
         error={error}
-        onChange={(newValue) =>
-          onChange(field.id, newValue)
-        }
+        onChange={(newValue) => onChange(field.id, newValue)}
       />
 
-      <div>
-        <button
-          type="button"
+      <div className="field-card-actions">
+        <button 
+          type="button" 
+          className="btn-secondary"
           onClick={() => onEdit(field.id)}
         >
-          Edit
+          Edit Field
         </button>
 
-        <button
-          type="button"
+        <button 
+          type="button" 
+          className="btn-danger"
           onClick={() => onRemove(field.id)}
         >
           Remove
         </button>
       </div>
 
-      {isSelected && <p>Currently editing</p>}
+      {isSelected && (
+        <span className="field-selected-indicator">Editing</span>
+      )}
     </article>
   );
 }

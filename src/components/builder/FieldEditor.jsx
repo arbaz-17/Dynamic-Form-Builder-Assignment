@@ -9,7 +9,6 @@ function FieldEditor({ field, onSave, onClose }) {
 
   function handleChange(event) {
     const { name, value, type, checked } = event.target;
-
     setDraft((prevDraft) => ({
       ...prevDraft,
       [name]: type === "checkbox" ? checked : value,
@@ -18,7 +17,6 @@ function FieldEditor({ field, onSave, onClose }) {
 
   function handleValidationChange(event) {
     const { name, value, type } = event.target;
-
     let parsedValue = value;
 
     if (type === "number") {
@@ -39,10 +37,7 @@ function FieldEditor({ field, onSave, onClose }) {
       ...prevDraft,
       options: prevDraft.options.map((option, optionIndex) =>
         optionIndex === index
-          ? {
-              ...option,
-              [key]: value,
-            }
+          ? { ...option, [key]: value }
           : option
       ),
     }));
@@ -51,7 +46,6 @@ function FieldEditor({ field, onSave, onClose }) {
   function handleAddOption() {
     setDraft((prevDraft) => {
       const nextOptionNumber = prevDraft.options.length + 1;
-
       return {
         ...prevDraft,
         options: [
@@ -68,9 +62,7 @@ function FieldEditor({ field, onSave, onClose }) {
   function handleRemoveOption(index) {
     setDraft((prevDraft) => ({
       ...prevDraft,
-      options: prevDraft.options.filter(
-        (_, optionIndex) => optionIndex !== index
-      ),
+      options: prevDraft.options.filter((_, optionIndex) => optionIndex !== index),
     }));
   }
 
@@ -89,10 +81,8 @@ function FieldEditor({ field, onSave, onClose }) {
       <h2>Edit Field</h2>
 
       <form onSubmit={handleSubmit}>
-        {/* Label */}
-        <div>
+        <div className="input-group">
           <label htmlFor="field-label">Label</label>
-
           <input
             id="field-label"
             name="label"
@@ -102,11 +92,9 @@ function FieldEditor({ field, onSave, onClose }) {
           />
         </div>
 
-        {/* Placeholder */}
         {showPlaceholder && (
-          <div>
+          <div className="input-group">
             <label htmlFor="field-placeholder">Placeholder</label>
-
             <input
               id="field-placeholder"
               name="placeholder"
@@ -117,79 +105,58 @@ function FieldEditor({ field, onSave, onClose }) {
           </div>
         )}
 
-        {/* Required */}
-        <div>
-          <label>
-            <input
-              name="required"
-              type="checkbox"
-              checked={draft.required}
-              onChange={handleChange}
-            />
-            Required
-          </label>
+        <div className="checkbox-group">
+          <input
+            id="field-required"
+            name="required"
+            type="checkbox"
+            checked={draft.required}
+            onChange={handleChange}
+          />
+          <label htmlFor="field-required">Required Field</label>
         </div>
 
         {/* Select options */}
         {field.type === "select" && (
-          <div>
+          <div className="options-section">
             <h3>Options</h3>
+            <div className="options-list">
+              {draft.options.map((option, index) => (
+                <div key={`${option.value}-${index}`} className="option-item">
+                  <div className="input-group">
+                    <label htmlFor={`option-label-${index}`}>Label</label>
+                    <input
+                      id={`option-label-${index}`}
+                      type="text"
+                      value={option.label}
+                      onChange={(event) => handleOptionChange(index, "label", event.target.value)}
+                    />
+                  </div>
 
-            {draft.options.map((option, index) => (
-              <div key={`${option.value}-${index}`}>
-                <div>
-                  <label htmlFor={`option-label-${index}`}>
-                    Label
-                  </label>
+                  <div className="input-group">
+                    <label htmlFor={`option-value-${index}`}>Value</label>
+                    <input
+                      id={`option-value-${index}`}
+                      type="text"
+                      value={option.value}
+                      onChange={(event) => handleOptionChange(index, "value", event.target.value)}
+                    />
+                  </div>
 
-                  <input
-                    id={`option-label-${index}`}
-                    type="text"
-                    value={option.label}
-                    onChange={(event) =>
-                      handleOptionChange(
-                        index,
-                        "label",
-                        event.target.value
-                      )
-                    }
-                  />
+                  {draft.options.length > 1 && (
+                    <button
+                      type="button"
+                      className="btn-danger btn-sm"
+                      onClick={() => handleRemoveOption(index)}
+                    >
+                      Remove Option
+                    </button>
+                  )}
                 </div>
+              ))}
+            </div>
 
-                <div>
-                  <label htmlFor={`option-value-${index}`}>
-                    Value
-                  </label>
-
-                  <input
-                    id={`option-value-${index}`}
-                    type="text"
-                    value={option.value}
-                    onChange={(event) =>
-                      handleOptionChange(
-                        index,
-                        "value",
-                        event.target.value
-                      )
-                    }
-                  />
-                </div>
-
-                {draft.options.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveOption(index)}
-                  >
-                    Remove
-                  </button>
-                )}
-              </div>
-            ))}
-
-            <button
-              type="button"
-              onClick={handleAddOption}
-            >
+            <button type="button" className="btn-secondary" onClick={handleAddOption}>
               + Add Option
             </button>
           </div>
@@ -197,12 +164,9 @@ function FieldEditor({ field, onSave, onClose }) {
 
         {/* Text validation */}
         {field.type === "text" && (
-          <>
-            <div>
-              <label htmlFor="min-length">
-                Minimum Length
-              </label>
-
+          <div className="validation-grid">
+            <div className="input-group">
+              <label htmlFor="min-length">Min Length</label>
               <input
                 id="min-length"
                 name="minLength"
@@ -213,11 +177,8 @@ function FieldEditor({ field, onSave, onClose }) {
               />
             </div>
 
-            <div>
-              <label htmlFor="max-length">
-                Maximum Length
-              </label>
-
+            <div className="input-group">
+              <label htmlFor="max-length">Max Length</label>
               <input
                 id="max-length"
                 name="maxLength"
@@ -227,17 +188,14 @@ function FieldEditor({ field, onSave, onClose }) {
                 onChange={handleValidationChange}
               />
             </div>
-          </>
+          </div>
         )}
 
         {/* Number validation */}
         {field.type === "number" && (
-          <>
-            <div>
-              <label htmlFor="number-min">
-                Minimum Value
-              </label>
-
+          <div className="validation-grid">
+            <div className="input-group">
+              <label htmlFor="number-min">Min Value</label>
               <input
                 id="number-min"
                 name="min"
@@ -247,11 +205,8 @@ function FieldEditor({ field, onSave, onClose }) {
               />
             </div>
 
-            <div>
-              <label htmlFor="number-max">
-                Maximum Value
-              </label>
-
+            <div className="input-group">
+              <label htmlFor="number-max">Max Value</label>
               <input
                 id="number-max"
                 name="max"
@@ -260,17 +215,14 @@ function FieldEditor({ field, onSave, onClose }) {
                 onChange={handleValidationChange}
               />
             </div>
-          </>
+          </div>
         )}
 
         {/* File validation */}
         {field.type === "file" && (
           <>
-            <div>
-              <label htmlFor="accepted-types">
-                Accepted File Types
-              </label>
-
+            <div className="input-group">
+              <label htmlFor="accepted-types">Accepted File Types</label>
               <input
                 id="accepted-types"
                 type="text"
@@ -293,11 +245,8 @@ function FieldEditor({ field, onSave, onClose }) {
               />
             </div>
 
-            <div>
-              <label htmlFor="max-file-size">
-                Maximum File Size (bytes)
-              </label>
-
+            <div className="input-group">
+              <label htmlFor="max-file-size">Max File Size (bytes)</label>
               <input
                 id="max-file-size"
                 name="maxSize"
@@ -312,27 +261,24 @@ function FieldEditor({ field, onSave, onClose }) {
 
         {/* Custom validation message */}
         {field.type !== "checkbox" && (
-          <div>
-            <label htmlFor="validation-message">
-              Error Message
-            </label>
-
+          <div className="input-group">
+            <label htmlFor="validation-message">Error Message</label>
             <input
               id="validation-message"
               name="message"
               type="text"
               value={draft.validation?.message ?? ""}
               onChange={handleValidationChange}
-              placeholder="Enter a custom error message"
+              placeholder="Custom error message"
             />
           </div>
         )}
 
-        {/* Actions */}
-        <div>
-          <button type="submit">Save</button>
-
-          <button type="button" onClick={onClose}>
+        <div className="editor-actions">
+          <button type="submit" className="btn-primary">
+            Save Changes
+          </button>
+          <button type="button" className="btn-secondary" onClick={onClose}>
             Cancel
           </button>
         </div>

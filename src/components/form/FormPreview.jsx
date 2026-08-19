@@ -14,42 +14,41 @@ function FormPreview({
   }
 
   return (
-    <section>
-      <div>
-        <h2>Form Preview</h2>
-
-        <button
-          type="button"
-          onClick={onBack}
-        >
+    <div className="preview-container">
+      <div className="preview-header">
+        <h2>Live Preview</h2>
+        <button type="button" className="btn-secondary" onClick={onBack}>
           Back to Builder
         </button>
       </div>
 
       {fields.length === 0 ? (
-        <p>
-          No fields have been added to this form yet.
-        </p>
+        <div className="preview-empty-state">
+          <p>No fields have been added to this form yet.</p>
+        </div>
       ) : (
-        <form onSubmit={handleSubmit}>
-          {fields.map((field) => (
-            <DynamicField
-              key={field.id}
-              field={field}
-              value={formValues[field.id]}
-              error={errors[field.id]}
-              onChange={(value) =>
-                onChange(field.id, value)
-              }
-            />
-          ))}
+        <form onSubmit={handleSubmit} className="preview-form">
+          <div className="preview-fields">
+            {fields.map((field) => (
+              <div key={field.id} className="preview-field-wrapper">
+                <DynamicField
+                  field={field}
+                  value={formValues[field.id]}
+                  error={errors[field.id]}
+                  onChange={(value) => onChange(field.id, value)}
+                />
+              </div>
+            ))}
+          </div>
 
-          <button type="submit">
-            Submit Form
-          </button>
+          <div className="preview-actions">
+            <button type="submit" className="btn-primary">
+              Submit Form
+            </button>
+          </div>
         </form>
       )}
-    </section>
+    </div>
   );
 }
 

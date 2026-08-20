@@ -105,7 +105,7 @@ The file input is handled differently because file inputs are not controlled thr
 
 `useEffect` is used to synchronize the React field configuration with browser `localStorage`.
 
-The detailed reasoning, dependency analysis, and justification for every `useEffect` are documented separately in the project's dedicated `useEffect` documentation.
+The detailed reasoning for `useEffect` usage is documented separately in the project's dedicated `useEffect` documentation.
 
 
 ## Local Setup

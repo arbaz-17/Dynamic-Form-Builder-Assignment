@@ -157,14 +157,13 @@ function FormBuilder() {
     console.log("Submitted form data:", formValues);
   }
 
-  // --- PREVIEW MODE RENDER ---
   if (mode === "preview") {
     return (
       <main className="app-shell">
         <header className="app-header">
           <h1>Preview Mode</h1>
 
-          <p>Test your form exactly as users will see it.</p>
+          <p>Test your form.</p>
         </header>
 
         <section className="builder-section">
@@ -189,7 +188,7 @@ function FormBuilder() {
     );
   }
 
-  // --- BUILDER MODE RENDER ---
+
   return (
     <main className="app-shell">
       <header className="app-header">

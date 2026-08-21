@@ -116,7 +116,7 @@ function FieldEditor({ field, onSave, onClose }) {
           <label htmlFor="field-required">Required Field</label>
         </div>
 
-        {/* Select options */}
+
         {field.type === "select" && (
           <div className="options-section">
             <h3>Options</h3>
@@ -162,7 +162,6 @@ function FieldEditor({ field, onSave, onClose }) {
           </div>
         )}
 
-        {/* Text validation */}
         {field.type === "text" && (
           <div className="validation-grid">
             <div className="input-group">
@@ -191,7 +190,6 @@ function FieldEditor({ field, onSave, onClose }) {
           </div>
         )}
 
-        {/* Number validation */}
         {field.type === "number" && (
           <div className="validation-grid">
             <div className="input-group">
@@ -218,7 +216,6 @@ function FieldEditor({ field, onSave, onClose }) {
           </div>
         )}
 
-        {/* File validation */}
         {field.type === "file" && (
           <>
             <div className="input-group">
@@ -259,7 +256,6 @@ function FieldEditor({ field, onSave, onClose }) {
           </>
         )}
 
-        {/* Custom validation message */}
         {field.type !== "checkbox" && (
           <div className="input-group">
             <label htmlFor="validation-message">Error Message</label>

@@ -6,18 +6,10 @@ Dynamic Form Builder is a React application created as the Week 5 internship ass
 
 The application allows users to dynamically build forms by adding different field types, configuring field properties and validation rules, previewing the generated form, validating user input, handling file uploads, and submitting the completed form.
 
-The project is built using:
-
-- React
-- JavaScript
-- Vite
-- CSS
-- Browser localStorage
-
 
 ## What Was Created
 
-- Dynamic field creation
+- Dynamic fields creation.
 - Support for Text, Email, Number, Select, Checkbox, and File fields
 - Field removal
 - Field configuration and editing
